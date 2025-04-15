@@ -14,7 +14,7 @@ const Contact = () => {
         <div className='flex flex-col items-start justify-center gap-6'>
           <p className='text-xl font-semibold text-gray-600'>Our Store</p>
           <p className='text-gray-500'>Sri Ashtalakshmi Mills<br />74/4,SKC Road, Erode</p>
-          <p className='text-gray-500'>Tel: (+11)-558-669-447 <br />Email: contact.trendify@info.com</p>
+          <p className='text-gray-500'>Tel: (+91)-90253-80910 <br />Email: contact.trendify@info.com</p>
           <p className='text-xl font-semibold text-gray-600'>Careers at Forever</p>
           <p className='text-gray-500'>Join us at Trendify! Explore job openings and help shape the future of fashion. <br />Explore our current job openings and discover how you can contribute to our mission of setting trends and creating style.</p>
           <button className='px-8 py-4 text-sm transition-all duration-500 border border-black hover:bg-gray-800 hover:text-white'>Explore Jobs</button>
