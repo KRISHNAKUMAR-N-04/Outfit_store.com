@@ -11,7 +11,7 @@ const ShopContextProvider = (props) => {
   const [cartItems, setCartItems] = useState({});
   const navigate = useNavigate();
 
-  const currency = "$";
+  const currency = "Rs. ";
   const delivery_fee = 10;
 
   useEffect(() => {
