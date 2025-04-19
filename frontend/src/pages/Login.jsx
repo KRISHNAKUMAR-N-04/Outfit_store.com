@@ -1,7 +1,10 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const Login = () => {
   const [currentState, setCurrentState] = useState("Sign Up");
+  const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -18,8 +21,8 @@ const Login = () => {
   
     const endpoint =
   currentState === "Login"
-    ? "http://localhost:4000/api/auth/login"
-    : "http://localhost:4000/api/auth/signup";
+    ? "http://localhost:5000/api/auth/login"
+    : "http://localhost:5000/api/auth/register";
 
   
     try {
@@ -36,6 +39,8 @@ const Login = () => {
       }
   
       alert(result.message || "Success");
+      navigate('/home')
+    
     } catch (err) {
       alert("Error: " + err.message);
     }
