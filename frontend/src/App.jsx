@@ -14,6 +14,9 @@ import Footer from './components/Footer'
 import SearchBar from './components/SearchBar'
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import ClientProfile from "./pages/ClientProfile";
+import { Navigate } from "react-router-dom";
+
 
 const App = () => {
   return (
@@ -22,6 +25,7 @@ const App = () => {
       <NavBar />
       <SearchBar />
       <Routes>
+        <Route path="/profile" element={localStorage.getItem("token") ? (<ClientProfile />) : (<Navigate to="/" />)}/>
         <Route path='/' element={<Home />} />
         <Route path='/collection' element={<Collection />} />
         <Route path='/about' element={<About />} />

@@ -8,19 +8,26 @@ import Orders from "./pages/Orders";
 import Login from "./components/Login";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { Slide } from "react-toastify"; // ✅ Fix: You need to import Slide
 
 export const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
 export const currency = (price) => {
-  return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(price);
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+  }).format(price);
 };
 
 const App = () => {
-  const [token, setToken] = useState(
-    localStorage.getItem("token") ? localStorage.getItem("token") : ""
-  );
+  const [token, setToken] = useState(localStorage.getItem("token") || "");
+
   useEffect(() => {
-    localStorage.setItem("token", token);
+    if (token) {
+      localStorage.setItem("token", token);
+    } else {
+      localStorage.removeItem("token"); // ✅ Optional cleanup
+    }
   }, [token]);
 
   return (
@@ -36,8 +43,9 @@ const App = () => {
         draggable
         pauseOnHover
         theme="colored"
-        transition:Slide
+        transition={Slide} // ✅ Fix: You had `transition:Slide` instead of `transition={Slide}`
       />
+
       {token === "" ? (
         <Login setToken={setToken} />
       ) : (

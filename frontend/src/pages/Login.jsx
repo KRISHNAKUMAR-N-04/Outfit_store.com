@@ -33,14 +33,15 @@ const Login = () => {
       });
   
       const result = await (response.ok ? response.json() : response.text());
-  
+
       if (!response.ok) {
         throw new Error(typeof result === "string" ? result : result.message);
       }
-  
-      alert(result.message || "Success");
-      navigate('/home')
-    
+      
+      localStorage.setItem("token", result.token);
+      localStorage.setItem("user", JSON.stringify(result.user)); // ✅ Save user
+      navigate("/profile"); // ✅ Go to profile
+      
     } catch (err) {
       alert("Error: " + err.message);
     }
