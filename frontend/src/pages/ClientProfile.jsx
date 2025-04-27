@@ -1,14 +1,24 @@
-import React from "react";
+import React, {useEffect} from "react";
 import { useNavigate } from "react-router-dom";
 
+
 const ClientProfile = () => {
-  const user = JSON.parse(localStorage.getItem("user"));
+
   const navigate = useNavigate();
+  const user = JSON.parse(localStorage.getItem("user"));
+
+  useEffect(() => {
+    if (!user) {
+      navigate('/login');
+    }
+  }, [user]);
+  
+
 
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
-    navigate("/");
+    navigate("/profile");
   };
 
   if (!user) return <p>Loading...</p>;

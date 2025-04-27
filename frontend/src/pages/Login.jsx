@@ -20,10 +20,9 @@ const Login = () => {
     event.preventDefault();
   
     const endpoint =
-  currentState === "Login"
-    ? "http://localhost:5000/api/auth/login"
-    : "http://localhost:5000/api/auth/register";
-
+      currentState === "Login"
+        ? "http://localhost:5000/api/auth/login"
+        : "http://localhost:5000/api/auth/register";
   
     try {
       const response = await fetch(endpoint, {
@@ -31,17 +30,17 @@ const Login = () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
+      
+      console.log("data receiver")
+      const result = await response.json();
   
-      const result = await (response.ok ? response.json() : response.text());
-
       if (!response.ok) {
-        throw new Error(typeof result === "string" ? result : result.message);
+        throw new Error(result.message || "Authentication failed");
       }
-      
+  
       localStorage.setItem("token", result.token);
-      localStorage.setItem("user", JSON.stringify(result.user)); // ✅ Save user
-      navigate("/profile"); // ✅ Go to profile
-      
+      localStorage.setItem("user", JSON.stringify(result.user));
+      navigate("/profile");
     } catch (err) {
       alert("Error: " + err.message);
     }
