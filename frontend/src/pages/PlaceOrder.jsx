@@ -1,12 +1,12 @@
 import React, { useContext, useState } from 'react';
 import Title from '../components/Title';
-import CartTotal from '../components/CartTotal';
 import { assets } from '../assets/assets';
+import CartTotal from '../components/CartTotal';
 import { ShopContext } from '../context/ShopContext';
 
 const PlaceOrder = () => {
   const [method, setMethod] = useState('cod');
-  const { navigate } = useContext(ShopContext);
+  const { navigate, getCartAmount } = useContext(ShopContext);
 
   const HandleRazorPay = async () => {
     if (!window.Razorpay) {
@@ -16,19 +16,28 @@ const PlaceOrder = () => {
 
     try {
       // Step 1: Create order from backend
-      const response = await fetch("http://localhost:4242/create-order", {
-        method: "POST",
+      const response = await fetch('http://localhost:5000/api/payment/create-order', {
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ amount: 500 }), // ₹500
-      });
+        body: JSON.stringify({ amount: 500 }) // example amount
+      })
+        .then(res => res.json())
+        .then(data => {
+          console.log('Order created:', data);
+          // Proceed with Razorpay checkout using the order_id
+        })
+        .catch(err => {
+          console.error('Order creation failed:', err);
+        });
+      
 
       const orderData = await response.json();
 
       // Step 2: Configure Razorpay options
       const options = {
-        key: "rzp_test_YourActualKeyHere", // 🔑 Replace with your Razorpay test key
+        key: "rzp_test_PH2VKUNXERfp6h", // 🔑 Replace with your Razorpay test key
         amount: orderData.amount,
         currency: "INR",
         name: "Your Store Name",

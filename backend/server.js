@@ -24,33 +24,31 @@ const razorpay = new Razorpay({
 
 
 
-// POST route to create Razorpay order
-app.post("/create-order", async (req, res) => {
+app.post('/api/payment/create-order', async (req, res) => {
   const { amount } = req.body;
 
-  const options = {
-    amount: amount * 100, // ₹10 becomes 1000 paise
-    currency: "INR",
-    receipt: "order_rcptid_11",
-  };
-
   try {
+    const options = {
+      amount: amount * 100, // in paise
+      currency: 'INR',
+      receipt: 'order_rcptid_' + Math.random(),
+    };
+
     const order = await razorpay.orders.create(options);
-    res.json(order); // sends back order.id, etc.
-  } catch (err) {
-    res.status(500).send(err);
+    res.json(order);
+  } catch (error) {
+    console.error('Error creating Razorpay order:', error);
+    res.status(500).json({ error: 'Failed to create Razorpay order' });
   }
 });
 
+
 // Connect to MongoDB and start server
-mongoose.connect(process.env.MONGO_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-})
+mongoose.connect(process.env.MONGO_URI)
 .then(() => {
   app.listen(process.env.PORT, () => {
     console.log(`Server running on port ${process.env.PORT}`);
-  });
+  });  
 })
 .catch((err) => {
   console.error('Database connection error:', err);
