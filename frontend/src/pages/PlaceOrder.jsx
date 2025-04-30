@@ -6,7 +6,8 @@ import { ShopContext } from '../context/ShopContext';
 
 const PlaceOrder = () => {
   const [method, setMethod] = useState('cod');
-  const { navigate, getCartAmount } = useContext(ShopContext);
+  const { navigate, getCartAmount, delivery_fee} = useContext(ShopContext);
+  const amount = getCartAmount() + delivery_fee;
 
   const HandleRazorPay = async () => {
     if (!window.Razorpay) {
@@ -21,31 +22,27 @@ const PlaceOrder = () => {
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ amount: 500 }) // example amount
-      })
-        .then(res => res.json())
-        .then(data => {
-          console.log('Order created:', data);
-          // Proceed with Razorpay checkout using the order_id
-        })
-        .catch(err => {
-          console.error('Order creation failed:', err);
-        });
-      
+        body: JSON.stringify({amount}) // example amount
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to create order on Razorpay');
+      }
 
       const orderData = await response.json();
+      console.log('Order created:', orderData);
 
       // Step 2: Configure Razorpay options
       const options = {
-        key: "rzp_test_PH2VKUNXERfp6h", // 🔑 Replace with your Razorpay test key
-        amount: orderData.amount,
+        key: "rzp_test_PH2VKUNXERfp6h", // Replace with your Razorpay test key
+        amount: orderData.amount, // This should be in paise (100 paise = 1 INR)
         currency: "INR",
         name: "Your Store Name",
         description: "Test Transaction",
         order_id: orderData.id,
         handler: function (response) {
-          alert(`✅ Payment Successful!\nPayment ID: ${response.razorpay_payment_id}`);
-          navigate('/orders');
+          console.log(`✅ Payment Successful!\nPayment ID: ${response.razorpay_payment_id}`);
+          navigate('/orders'); // Navigate to orders page
         },
         prefill: {
           name: "John Doe",
@@ -72,9 +69,9 @@ const PlaceOrder = () => {
 
   const handlePayment = () => {
     if (method === 'razorpay') {
-      HandleRazorPay();
+      HandleRazorPay(); // Initiate Razorpay if Razorpay is selected
     } else {
-      navigate('/orders');
+      navigate('/orders'); // Proceed to orders if COD is selected
     }
   };
 

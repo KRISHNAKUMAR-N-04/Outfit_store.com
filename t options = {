@@ -1,0 +1,65 @@
+[33mcommit cfb3d3cfb2fc8689fcafaed019be282f0c27a598[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m)[m
+Author: KRISHNAKUMAR-N-04 <krishnakumarnagarajan04@gmail.com>
+Date:   Tue Apr 29 22:59:25 2025 +0530
+
+    Testing payment using Razorpay
+
+[33mcommit 60fe79ba773e67b1029de905bc3085d4171e9b8b[m
+Author: KRISHNAKUMAR-N-04 <krishnakumarnagarajan04@gmail.com>
+Date:   Tue Apr 29 21:36:16 2025 +0530
+
+    Working on payment
+
+[33mcommit f8bb5685998b6f9b1e3e55801814af1ce5f9934d[m
+Author: KRISHNAKUMAR-N-04 <krishnakumarnagarajan04@gmail.com>
+Date:   Tue Apr 29 09:03:31 2025 +0530
+
+    Updates on authentication
+
+[33mcommit eb658c51c7000cd65395fea6a53e5f2dabf928c5[m
+Author: KRISHNAKUMAR-N-04 <krishnakumarnagarajan04@gmail.com>
+Date:   Sun Apr 27 18:58:08 2025 +0530
+
+    Data storage managed into mongodb, next carrying payment
+
+[33mcommit 8e23c8aa1c9dfbc04f135fae8e1048fafb08893c[m
+Author: KRISHNAKUMAR-N-04 <krishnakumarnagarajan04@gmail.com>
+Date:   Wed Apr 23 21:14:50 2025 +0530
+
+    Working on admin login and payment page
+
+[33mcommit 59569c0fc5b8bb7f2a7e86c9a2a609dedb63031a[m
+Author: KRISHNAKUMAR-N-04 <krishnakumarnagarajan04@gmail.com>
+Date:   Sat Apr 19 22:00:00 2025 +0530
+
+    Authentication updated, starting context
+
+[33mcommit b6598a58dc376b51941be45274498691da960352[m
+Author: KRISHNAKUMAR-N-04 <krishnakumarnagarajan04@gmail.com>
+Date:   Wed Apr 16 22:02:13 2025 +0530
+
+    Updates on Backend, Working on authentication
+
+[33mcommit 68c1cd2c8dccdad2028702afb037119521854dc4[m
+Author: KRISHNAKUMAR-N-04 <krishnakumarnagarajan04@gmail.com>
+Date:   Tue Apr 15 09:24:04 2025 +0530
+
+    Footer updated
+
+[33mcommit 0650d8519245d9a1563b16dc0775ae3040e169b9[m
+Author: KRISHNAKUMAR-N-04 <krishnakumarnagarajan04@gmail.com>
+Date:   Tue Apr 15 09:22:46 2025 +0530
+
+    Contact updated
+
+[33mcommit c1ac176a714bca27c780d231e718bf319a025ea9[m
+Author: KRISHNAKUMAR-N-04 <krishnakumarnagarajan04@gmail.com>
+Date:   Mon Apr 14 17:58:02 2025 +0530
+
+    Updated
+
+[33mcommit 29d71cf68eaa53870e6ef21e6367225ef447ca78[m
+Author: KRISHNAKUMAR-N-04 <krishnakumarnagarajan04@gmail.com>
+Date:   Sun Mar 2 19:04:29 2025 +0530
+
+    First
