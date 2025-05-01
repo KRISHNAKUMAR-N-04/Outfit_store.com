@@ -6,7 +6,7 @@ import { ShopContext } from '../context/ShopContext';
 
 const PlaceOrder = () => {
   const [method, setMethod] = useState('cod');
-  const { navigate, getCartAmount, delivery_fee} = useContext(ShopContext);
+  const { navigate, getCartAmount, delivery_fee, UpdateQuantity} = useContext(ShopContext);
   const amount = getCartAmount() + delivery_fee;
 
   const HandleRazorPay = async () => {
@@ -73,6 +73,8 @@ const PlaceOrder = () => {
     } else {
       navigate('/orders'); // Proceed to orders if COD is selected
     }
+    
+
   };
 
   return (

@@ -60,7 +60,7 @@ const ShopContextProvider = (props) => {
             totalCount += cartItems[items][item];
           }
         } catch (error) {
-          // INFO: Error Handling
+          console.error("The error in getCart Amount", err)
         }
       }
     }
