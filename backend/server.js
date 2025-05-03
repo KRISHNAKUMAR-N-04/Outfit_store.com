@@ -4,6 +4,7 @@ const Razorpay = require('razorpay');
 const cors = require('cors');
 const dotenv = require('dotenv');
 const authRoutes = require('./routes/authRoutes');
+const orderRoutes = require('./routes/orderRoutes')
 
 dotenv.config();
 
@@ -15,6 +16,7 @@ app.use(express.json());
 
 // Routes
 app.use('/api/auth', authRoutes);
+app.use('/api/order', orderRoutes)
 
 
 const razorpay = new Razorpay({

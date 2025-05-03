@@ -22,7 +22,7 @@ const PlaceOrder = () => {
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({amount}) // example amount
+        body: JSON.stringify({amount})
       });
 
       if (!response.ok) {
@@ -40,10 +40,42 @@ const PlaceOrder = () => {
         name: "Your Store Name",
         description: "Test Transaction",
         order_id: orderData.id,
-        handler: function (response) {
+        handler: async function (response) {
           console.log(`✅ Payment Successful!\nPayment ID: ${response.razorpay_payment_id}`);
-          navigate('/orders'); // Navigate to orders page
-        },
+        
+          // 🛒 Get cart items from localStorage
+          const storedItems = JSON.parse(localStorage.getItem("cartItems")) || {};
+        
+          // 📦 Prepare the items array
+          const items = [];
+          for (let productId in storedItems) {
+            for (let size in storedItems[productId]) {
+              items.push({
+                productId,
+                size,
+                quantity: storedItems[productId][size]
+              });
+            }
+          }
+        
+          // 📤 Send order to backend
+          await fetch('http://localhost:5000/api/order/create', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              paymentId: response.razorpay_payment_id,
+              orderId: response.razorpay_order_id,
+              amount,
+              items
+            })
+          });
+        
+          localStorage.removeItem("cartItems"); // 🧹 Clear cart after successful payment
+          navigate('/orders'); // ✅ Redirect to orders page
+        }
+        ,
         prefill: {
           name: "John Doe",
           email: "john@example.com",
