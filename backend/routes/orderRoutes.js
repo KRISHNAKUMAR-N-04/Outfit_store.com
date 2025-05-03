@@ -1,34 +1,34 @@
 const express = require('express');
 const router = express.Router();
-const Order = require('../models/Orders');
+const Order = require('../models/Order');
+const protect = require('../middlware/authMiddleware'); // your current protect middleware
 
-router.post('/create', async (req, res) => {
+// Create Order (COD and Online)
+router.post('/create', protect, async (req, res) => {
   try {
-    const { paymentId, orderId, amount, items } = req.body;
-
     const newOrder = new Order({
-      paymentId,
-      orderId,
-      amount,
-      items,
-      status: 'Processing',
+      userId: req.user._id,
+      paymentId: req.body.paymentId || null,
+      orderId: req.body.orderId || null,
+      amount: req.body.amount,
+      items: req.body.items,
+      paymentMethod: req.body.paymentMethod || 'Online',
     });
 
-    await newOrder.save();
-
-    res.status(200).json({ success: true, message: 'Order saved', order: newOrder });
+    const savedOrder = await newOrder.save();
+    res.status(201).json(savedOrder);
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ success: false, message: 'Failed to save order' });
+    res.status(500).json({ message: 'Order creation failed', error: err.message });
   }
 });
 
-router.get('/all', async (req, res) => {
+// Get all orders of logged-in user
+router.get('/all', protect, async (req, res) => {
   try {
-    const orders = await Order.find().sort({ createdAt: -1 });
+    const orders = await Order.find({ userId: req.user._id }).sort({ createdAt: -1 });
     res.status(200).json(orders);
   } catch (err) {
-    res.status(500).json({ message: 'Error fetching orders' });
+    res.status(500).json({ message: 'Failed to fetch orders', error: err.message });
   }
 });
 

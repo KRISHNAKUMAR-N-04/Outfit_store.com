@@ -62,13 +62,15 @@ const PlaceOrder = () => {
           await fetch('http://localhost:5000/api/order/create', {
             method: 'POST',
             headers: {
-              'Content-Type': 'application/json'
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`
             },
             body: JSON.stringify({
               paymentId: response.razorpay_payment_id,
               orderId: response.razorpay_order_id,
               amount,
-              items
+              items,
+              paymentMethod: 'razorpay'
             })
           });
         
@@ -99,14 +101,47 @@ const PlaceOrder = () => {
     }
   };
 
-  const handlePayment = () => {
-    if (method === 'razorpay') {
-      HandleRazorPay(); // Initiate Razorpay if Razorpay is selected
-    } else {
-      navigate('/orders'); // Proceed to orders if COD is selected
+  const handlePayment = async () => {
+    const storedItems = JSON.parse(localStorage.getItem("cartItems")) || {};
+    const items = [];
+  
+    for (let productId in storedItems) {
+      for (let size in storedItems[productId]) {
+        items.push({
+          productId,
+          size,
+          quantity: storedItems[productId][size]
+        });
+      }
     }
-    
-
+  
+    if (method === 'razorpay') {
+      HandleRazorPay(); // Razorpay logic stays unchanged
+    } else {
+      // Handle COD
+      try {
+        await fetch('http://localhost:5000/api/order/create', {
+          method: 'POST',
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            paymentId: 'COD',
+            orderId: 'COD-' + Date.now(),
+            amount,
+            items,
+            paymentMethod: 'cod'
+          })
+        });
+  
+        localStorage.removeItem("cartItems");
+        navigate('/orders');
+      } catch (error) {
+        console.error("COD Order error:", error);
+        alert("Failed to place COD order");
+      }
+    } 
   };
 
   return (
