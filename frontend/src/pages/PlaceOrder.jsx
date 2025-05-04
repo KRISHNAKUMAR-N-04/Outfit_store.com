@@ -1,4 +1,5 @@
-import React, { useContext, useState } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Title from '../components/Title';
 import { assets } from '../assets/assets';
 import CartTotal from '../components/CartTotal';
@@ -6,121 +7,60 @@ import { ShopContext } from '../context/ShopContext';
 
 const PlaceOrder = () => {
   const [method, setMethod] = useState('cod');
-  const { navigate, getCartAmount, delivery_fee, UpdateQuantity} = useContext(ShopContext);
+  const { getCartAmount, delivery_fee, products } = useContext(ShopContext);
+  const navigate = useNavigate();
+  const token = localStorage.getItem('token');
   const amount = getCartAmount() + delivery_fee;
 
-  const HandleRazorPay = async () => {
-    if (!window.Razorpay) {
-      alert("Razorpay SDK not loaded. Make sure to include Razorpay script in index.html.");
-      return;
+  useEffect(() => {
+    if (!token) {
+      alert('Please login to place an order.');
+      navigate('/login');
     }
+  }, [token, navigate]);
 
-    try {
-      // Step 1: Create order from backend
-      const response = await fetch('http://localhost:5000/api/payment/create-order', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({amount})
-      });
+  const createOrderPayload = () => {
+    const storedItems = JSON.parse(localStorage.getItem("cartItems")) || {};
+    const items = [];
 
-      if (!response.ok) {
-        throw new Error('Failed to create order on Razorpay');
-      }
-
-      const orderData = await response.json();
-      console.log('Order created:', orderData);
-
-      // Step 2: Configure Razorpay options
-      const options = {
-        key: "rzp_test_PH2VKUNXERfp6h", // Replace with your Razorpay test key
-        amount: orderData.amount, // This should be in paise (100 paise = 1 INR)
-        currency: "INR",
-        name: "Your Store Name",
-        description: "Test Transaction",
-        order_id: orderData.id,
-        handler: async function (response) {
-          console.log(`✅ Payment Successful!\nPayment ID: ${response.razorpay_payment_id}`);
-        
-          // 🛒 Get cart items from localStorage
-          const storedItems = JSON.parse(localStorage.getItem("cartItems")) || {};
-        
-          // 📦 Prepare the items array
-          const items = [];
-          for (let productId in storedItems) {
-            for (let size in storedItems[productId]) {
-              items.push({
-                productId,
-                size,
-                quantity: storedItems[productId][size]
-              });
-            }
-          }
-        
-          // 📤 Send order to backend
-          await fetch('http://localhost:5000/api/order/create', {
-            method: 'POST',
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`
-            },
-            body: JSON.stringify({
-              paymentId: response.razorpay_payment_id,
-              orderId: response.razorpay_order_id,
-              amount,
-              items,
-              paymentMethod: 'razorpay'
-            })
+    for (let productId in storedItems) {
+      for (let size in storedItems[productId]) {
+        const product = products.find(p => p._id === productId);
+        if (product) {
+          items.push({
+            productId,
+            name: product.name,
+            quantity: storedItems[productId][size],
+            price: product.price,
+            size,
           });
-        
-          localStorage.removeItem("cartItems"); // 🧹 Clear cart after successful payment
-          navigate('/orders'); // ✅ Redirect to orders page
         }
-        ,
-        prefill: {
-          name: "John Doe",
-          email: "john@example.com",
-          contact: "9999999999",
-        },
-        theme: {
-          color: "#3399cc",
-        }
-      };
-
-      const rzp = new window.Razorpay(options);
-
-      rzp.on('payment.failed', function (response) {
-        alert(`❌ Payment Failed\nReason: ${response.error.description}`);
-      });
-
-      rzp.open();
-    } catch (error) {
-      console.error("Error in Razorpay:", error);
-      alert("Something went wrong while initiating Razorpay.");
+      }
     }
+
+    return items;
   };
 
   const handlePayment = async () => {
-    const storedItems = JSON.parse(localStorage.getItem("cartItems")) || {};
-    const items = [];
-  
-    for (let productId in storedItems) {
-      for (let size in storedItems[productId]) {
-        items.push({
-          productId,
-          size,
-          quantity: storedItems[productId][size]
-        });
-      }
+    const items = createOrderPayload();
+
+    if (items.length === 0) {
+      alert("Cart is empty.");
+      return;
     }
-  
+
     if (method === 'razorpay') {
-      HandleRazorPay(); // Razorpay logic stays unchanged
+      handleRazorPay(items);
     } else {
-      // Handle COD
       try {
-        await fetch('http://localhost:5000/api/order/create', {
+        console.log("Sending order:", {
+          paymentId: 'COD',
+          orderId: 'COD-' + Date.now(),
+          amount,
+          items,
+          paymentMethod: 'cod'
+        });
+        const res = await fetch('http://localhost:5000/api/order/create', {
           method: 'POST',
           headers: {
             "Content-Type": "application/json",
@@ -134,14 +74,90 @@ const PlaceOrder = () => {
             paymentMethod: 'cod'
           })
         });
-  
+
+        if (!res.ok) {
+          const errorRes = await res.json();
+          throw new Error(errorRes.message || "COD order creation failed");
+        }
+
         localStorage.removeItem("cartItems");
         navigate('/orders');
-      } catch (error) {
-        console.error("COD Order error:", error);
-        alert("Failed to place COD order");
+      } catch (err) {
+        console.error("COD Order error:", err);
+        alert("Failed to place COD order: " + err.message);
       }
-    } 
+    }
+  };
+
+  const handleRazorPay = async (items) => {
+    try {
+      const res = await fetch('http://localhost:5000/api/payment/create-order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ amount })
+      });
+
+      if (!res.ok) throw new Error('Failed to create Razorpay order');
+      const orderData = await res.json();
+
+      const options = {
+        key: "rzp_test_PH2VKUNXERfp6h",
+        amount: orderData.amount,
+        currency: "INR",
+        name: "Clothing Store",
+        description: "Order Payment",
+        order_id: orderData.id,
+        handler: async function (response) {
+          try {
+            console.log("Sending order:", {
+              paymentId: 'COD',
+              orderId: 'COD-' + Date.now(),
+              amount,
+              items,
+              paymentMethod: 'cod'
+            });
+            const backendRes = await fetch('http://localhost:5000/api/order/create', {
+              method: 'POST',
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`
+              },
+              body: JSON.stringify({
+                paymentId: response.razorpay_payment_id,
+                orderId: response.razorpay_order_id,
+                amount,
+                items,
+                paymentMethod: 'razorpay'
+              })
+            });
+
+            if (!backendRes.ok) throw new Error("Failed to store Razorpay order");
+
+            localStorage.removeItem("cartItems");
+            navigate('/orders');
+          } catch (err) {
+            console.error("Failed to save Razorpay order:", err);
+            alert("Payment succeeded but order creation failed.");
+          }
+        },
+        prefill: {
+          name: "John Doe",
+          email: "john@example.com",
+          contact: "9999999999",
+        },
+        theme: { color: "#3399cc" }
+      };
+
+      const rzp = new window.Razorpay(options);
+      rzp.on('payment.failed', function (response) {
+        alert(`Payment Failed\nReason: ${response.error.description}`);
+      });
+
+      rzp.open();
+    } catch (error) {
+      console.error("Razorpay error:", error);
+      alert("Razorpay payment failed.");
+    }
   };
 
   return (
@@ -168,13 +184,9 @@ const PlaceOrder = () => {
         <input className='w-full px-4 py-2 border border-gray-300 rounded' type="number" placeholder='Mobile' />
       </div>
 
-      {/* Right Side Content */}
+      {/* Right Side */}
       <div className='mt-8'>
-        <div className='mt-8 min-w-80'>
-          <CartTotal />
-        </div>
-
-        {/* Payment Methods */}
+        <CartTotal />
         <div className='mt-12'>
           <Title text1={'PAYMENT'} text2={'METHODS'} />
           <div className='flex flex-col gap-3 lg:flex-row'>
@@ -187,8 +199,6 @@ const PlaceOrder = () => {
               <p className='mx-4 text-sm font-medium text-gray-500'>CASH ON DELIVERY</p>
             </div>
           </div>
-
-          {/* Place Order Button */}
           <div className='w-full mt-8 text-end'>
             <button onClick={handlePayment} className='px-16 py-3 text-sm text-white bg-black active:bg-gray-800'>
               PLACE ORDER

@@ -7,35 +7,26 @@ const Orders = () => {
 
   useEffect(() => {
     const fetchOrders = async () => {
+      const token = localStorage.getItem('token');
+      if (!token) return setError("No token found");
+  
       try {
-        const token = localStorage.getItem('token'); // Get token from localStorage
-    
-        if (!token) {
-          setError('No token found, please log in again');
-          return;
-        }
-    
-        const response = await fetch('http://localhost:5000/api/order/all', {
-          method: 'GET',
+        const res = await fetch('http://localhost:5000/api/order/all', {
           headers: {
             'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`, // Pass token in Authorization header
-          },
+            Authorization: `Bearer ${token}`
+          }
         });
-    
-        if (!response.ok) {
-          throw new Error('Failed to fetch orders');
-        }
-    
-        const data = await response.json();
+  
+        if (!res.ok) throw new Error('Failed to fetch');
+        const data = await res.json();
         setOrders(data);
       } catch (err) {
-        console.error('Fetch error:', err);
-        setError('Failed to fetch orders');
+        console.error(err);
+        setError("Failed to fetch orders");
       }
     };
-    
-
+  
     fetchOrders();
   }, []);
 

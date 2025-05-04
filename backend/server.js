@@ -6,26 +6,21 @@ const dotenv = require('dotenv');
 const authRoutes = require('./routes/authRoutes');
 const orderRoutes = require('./routes/orderRoutes');
 
-// Load environment variables
 dotenv.config();
 
 const app = express();
-
-// Middleware
 app.use(cors());
-app.use(express.json()); // To parse JSON request bodies
+app.use(express.json());
 
-// Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/order', orderRoutes);
 
-// Initialize Razorpay instance with keys from environment variables
 const razorpay = new Razorpay({
-  key_id: process.env.RAZORPAY_KEY_ID, // Replace with your Key ID from env variables
-  key_secret: process.env.RAZORPAY_KEY_SECRET, // Replace with your Key Secret from env variables
+  key_id: process.env.RAZORPAY_KEY_ID,
+  key_secret: process.env.RAZORPAY_KEY_SECRET,
 });
 
-// Route to create a payment order
+// Create Razorpay order
 app.post('/api/payment/create-order', async (req, res) => {
   const { amount } = req.body;
 
@@ -35,9 +30,9 @@ app.post('/api/payment/create-order', async (req, res) => {
 
   try {
     const options = {
-      amount: amount * 100, // Convert amount to paise (1 INR = 100 paise)
+      amount: amount * 100,
       currency: 'INR',
-      receipt: 'order_rcptid_' + Math.random(), // Unique receipt ID
+      receipt: 'order_rcptid_' + Math.random(),
     };
 
     const order = await razorpay.orders.create(options);
@@ -48,10 +43,9 @@ app.post('/api/payment/create-order', async (req, res) => {
   }
 });
 
-// Connect to MongoDB and start the server
 mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => {
-    app.listen(process.env.PORT, () => {
+    app.listen(process.env.PORT || 5000, () => {
       console.log(`Server running on port ${process.env.PORT}`);
     });
   })
