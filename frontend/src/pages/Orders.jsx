@@ -33,6 +33,36 @@ const Orders = () => {
     fetchOrders();
   }, []);
 
+  // Function to handle canceling an order
+  const cancelOrder = async (orderId, paymentMethod) => {
+    const token = localStorage.getItem('token');
+    if (!token) return setError('No token found');
+
+    try {
+      const res = await fetch(`http://localhost:5000/api/order/cancel/${orderId}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!res.ok) throw new Error('Failed to cancel the order');
+
+      const updatedOrder = await res.json();
+      setOrders((prevOrders) => prevOrders.filter((order) => order._id !== orderId));
+
+      if (paymentMethod === 'razorpay') {
+        alert('Your order has been canceled. A refund will be processed within 5-7 working days. For further assistance, contact us at 1800-123-4567.');
+      } else {
+        alert('Your order has been canceled successfully.');
+      }
+    } catch (err) {
+      console.error(err);
+      setError('Failed to cancel order');
+    }
+  };
+
   return (
     <div className='pt-16 border-t'>
       <div className='text-2xl'>
@@ -84,6 +114,16 @@ const Orders = () => {
                     </div>
                   );
                 })}
+              </div>
+
+              <div className='flex end-4 justify-between items-center mt-4'>
+                {/* Cancel Button */}
+                <button
+                  onClick={() => cancelOrder(order._id, order.paymentMethod)}
+                  className='bg-gray-800 text-white px-4 py-2 rounded-sm'
+                >
+                  Cancel Order
+                </button>
               </div>
             </div>
           ))
