@@ -37,6 +37,7 @@ const Orders = () => {
   const cancelOrder = async (orderId, paymentMethod) => {
     const token = localStorage.getItem('token');
     if (!token) return setError('No token found');
+    console.log("Order id : ", orderId)
 
     try {
       const res = await fetch(`http://localhost:5000/api/order/cancel/${orderId}`, {

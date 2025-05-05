@@ -12,6 +12,17 @@ const PlaceOrder = () => {
   const token = localStorage.getItem('token');
   const amount = getCartAmount() + delivery_fee;
 
+  // Form field states
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [email, setEmail] = useState('');
+  const [street, setStreet] = useState('');
+  const [city, setCity] = useState('');
+  const [stateValue, setStateValue] = useState('');
+  const [zip, setZip] = useState('');
+  const [country, setCountry] = useState('');
+  const [mobile, setMobile] = useState('');
+
   useEffect(() => {
     if (!token) {
       alert('Please login to place an order.');
@@ -41,7 +52,26 @@ const PlaceOrder = () => {
     return items;
   };
 
+  const validateForm = () => {
+    return (
+      firstName.trim() &&
+      lastName.trim() &&
+      email.trim() &&
+      street.trim() &&
+      city.trim() &&
+      stateValue.trim() &&
+      zip.trim() &&
+      country.trim() &&
+      mobile.trim()
+    );
+  };
+
   const handlePayment = async () => {
+    if (!validateForm()) {
+      alert("Please fill in all delivery information fields.");
+      return;
+    }
+
     const items = createOrderPayload();
 
     if (items.length === 0) {
@@ -53,13 +83,6 @@ const PlaceOrder = () => {
       handleRazorPay(items);
     } else {
       try {
-        console.log("Sending order:", {
-          paymentId: 'COD',
-          orderId: 'COD-' + Date.now(),
-          amount,
-          items,
-          paymentMethod: 'cod'
-        });
         const res = await fetch('http://localhost:5000/api/order/create', {
           method: 'POST',
           headers: {
@@ -109,13 +132,6 @@ const PlaceOrder = () => {
         order_id: orderData.id,
         handler: async function (response) {
           try {
-            console.log("Sending order:", {
-              paymentId: 'COD',
-              orderId: 'COD-' + Date.now(),
-              amount,
-              items,
-              paymentMethod: 'cod'
-            });
             const backendRes = await fetch('http://localhost:5000/api/order/create', {
               method: 'POST',
               headers: {
@@ -141,9 +157,9 @@ const PlaceOrder = () => {
           }
         },
         prefill: {
-          name: "John Doe",
-          email: "john@example.com",
-          contact: "9999999999",
+          name: firstName + " " + lastName,
+          email,
+          contact: mobile,
         },
         theme: { color: "#3399cc" }
       };
@@ -168,20 +184,20 @@ const PlaceOrder = () => {
           <Title text1={'DELIVERY'} text2={'INFORMATION'} />
         </div>
         <div className='flex gap-3'>
-          <input className='w-full px-4 py-2 border border-gray-300 rounded' type="text" placeholder='First Name' />
-          <input className='w-full px-4 py-2 border border-gray-300 rounded' type="text" placeholder='Last Name' />
+          <input className='w-full px-4 py-2 border border-gray-300 rounded' type="text" placeholder='First Name' value={firstName} onChange={(e) => setFirstName(e.target.value)} />
+          <input className='w-full px-4 py-2 border border-gray-300 rounded' type="text" placeholder='Last Name' value={lastName} onChange={(e) => setLastName(e.target.value)} />
         </div>
-        <input className='w-full px-4 py-2 border border-gray-300 rounded' type="email" placeholder='Email Address' />
-        <input className='w-full px-4 py-2 border border-gray-300 rounded' type="text" placeholder='Street' />
+        <input className='w-full px-4 py-2 border border-gray-300 rounded' type="email" placeholder='Email Address' value={email} onChange={(e) => setEmail(e.target.value)} />
+        <input className='w-full px-4 py-2 border border-gray-300 rounded' type="text" placeholder='Street' value={street} onChange={(e) => setStreet(e.target.value)} />
         <div className='flex gap-3'>
-          <input className='w-full px-4 py-2 border border-gray-300 rounded' type="text" placeholder='City' />
-          <input className='w-full px-4 py-2 border border-gray-300 rounded' type="text" placeholder='State' />
+          <input className='w-full px-4 py-2 border border-gray-300 rounded' type="text" placeholder='City' value={city} onChange={(e) => setCity(e.target.value)} />
+          <input className='w-full px-4 py-2 border border-gray-300 rounded' type="text" placeholder='State' value={stateValue} onChange={(e) => setStateValue(e.target.value)} />
         </div>
         <div className='flex gap-3'>
-          <input className='w-full px-4 py-2 border border-gray-300 rounded' type="number" placeholder='Zip Code' />
-          <input className='w-full px-4 py-2 border border-gray-300 rounded' type="text" placeholder='Country' />
+          <input className='w-full px-4 py-2 border border-gray-300 rounded' type="number" placeholder='Zip Code' value={zip} onChange={(e) => setZip(e.target.value)} />
+          <input className='w-full px-4 py-2 border border-gray-300 rounded' type="text" placeholder='Country' value={country} onChange={(e) => setCountry(e.target.value)} />
         </div>
-        <input className='w-full px-4 py-2 border border-gray-300 rounded' type="number" placeholder='Mobile' />
+        <input className='w-full px-4 py-2 border border-gray-300 rounded' type="number" placeholder='Mobile' value={mobile} onChange={(e) => setMobile(e.target.value)} />
       </div>
 
       {/* Right Side */}
