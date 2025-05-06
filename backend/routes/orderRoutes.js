@@ -47,22 +47,36 @@ router.get('/all', protect, async (req, res) => {
     res.status(500).json({ message: 'Failed to fetch orders', error: err.message });
   }
 });
-
-// Backend route
-router.delete('/api/order/cancel/:id', async (req, res) => {
-  const { id } = req.params.id;
+router.delete('/cancel/:id', async (req, res) => {
   try {
-    const order = await Order.findById(id);
+    const orderId = req.params.id;
+
+    const order = await Order.findById(orderId);
     if (!order) {
       return res.status(404).json({ error: 'Order not found' });
     }
-    order.status = 'Cancelled';  // You can update the order status or handle cancellation differently
-    await order.save();
-    res.status(200).json(order);
+
+    // ✅ If payment method is 'razorpay', just update the status
+    if (order.paymentMethod === 'razorpay') {
+      order.status = 'Cancelled';
+      await order.save();
+      return res.status(200).json({ message: 'Order status updated to Cancelled (Razorpay)' });
+    }
+
+    // ✅ For non-Razorpay orders, delete the order
+    const deleted = await Order.findByIdAndDelete(orderId);
+
+    if (!deleted) {
+      return res.status(500).json({ error: 'Failed to delete order after updating' });
+    }
+
+    res.status(200).json({ message: 'Order status updated and deleted from MongoDB' });
   } catch (err) {
-    res.status(500).json({ error: 'Failed to cancel order' });
+    console.error(err);
+    res.status(500).json({ error: 'Failed to cancel and delete order' });
   }
 });
+
 
 
 module.exports = router;

@@ -85,7 +85,7 @@ const Orders = () => {
               <p className='text-sm'>Amount: Rs. {order.amount}</p>
               <p className='text-sm'>Mode of Payment: {order.paymentMethod}</p>
 
-              <p className='text-sm'>Status: Order Placed</p>
+              <p className='text-sm'>Status: {order.status || 'Order Placed'}</p>
               <p className='text-sm'>
                 Date: {new Date(order.createdAt).toLocaleString()}
               </p>
