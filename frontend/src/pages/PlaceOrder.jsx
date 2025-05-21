@@ -4,6 +4,7 @@ import Title from '../components/Title';
 import { assets } from '../assets/assets';
 import CartTotal from '../components/CartTotal';
 import { ShopContext } from '../context/ShopContext';
+import BASE_URL from '../utils/api';
 
 const PlaceOrder = () => {
   const [method, setMethod] = useState('cod');
@@ -114,7 +115,7 @@ const PlaceOrder = () => {
 
   const handleRazorPay = async (items) => {
     try {
-      const res = await fetch('http://localhost:5000/api/payment/create-order', {
+      const res = await fetch(`${BASE_URL}/api/payment/create-order`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ amount })

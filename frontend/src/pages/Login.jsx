@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import BASE_URL from "../utils/api";
 
 const Login = () => {
   const [currentState, setCurrentState] = useState("Sign Up");
@@ -21,8 +22,8 @@ const Login = () => {
   
     const endpoint =
       currentState === "Login"
-        ? "http://localhost:5000/api/auth/login"
-        : "http://localhost:5000/api/auth/register";
+        ? `${BASE_URL}/api/auth/login`
+        : `${BASE_URL}/api/auth/register`;
   
     try {
       const response = await fetch(endpoint, {
