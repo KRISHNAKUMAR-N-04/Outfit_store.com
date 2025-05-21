@@ -20,7 +20,6 @@ const razorpay = new Razorpay({
   key_secret: process.env.RAZORPAY_KEY_SECRET,
 });
 
-// Create Razorpay order
 app.post('/api/payment/create-order', async (req, res) => {
   const { amount } = req.body;
 
@@ -43,10 +42,12 @@ app.post('/api/payment/create-order', async (req, res) => {
   }
 });
 
+const PORT = process.env.PORT || 5000;
+
 mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => {
-    app.listen(process.env.PORT || 5000, () => {
-      console.log(`Server running on port ${process.env.PORT}`);
+    app.listen(PORT, () => {
+      console.log(`Server running on port ${PORT}`);
     });
   })
   .catch((err) => {
