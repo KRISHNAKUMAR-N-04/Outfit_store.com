@@ -68,7 +68,7 @@ router.delete('/cancel/:id', async (req, res) => {
 
     if (!deleted) {
       return res.status(500).json({ error: 'Failed to delete order after updating' });
-    }
+    } 
 
     res.status(200).json({ message: 'Order status updated and deleted from MongoDB' });
   } catch (err) {
