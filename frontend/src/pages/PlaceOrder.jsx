@@ -84,7 +84,7 @@ const PlaceOrder = () => {
       handleRazorPay(items);
     } else {
       try {
-        const res = await fetch('http://localhost:5000/api/order/create', {
+        const res = await fetch(`${BASE_URL}/api/order/create`, {
           method: 'POST',
           headers: {
             "Content-Type": "application/json",
