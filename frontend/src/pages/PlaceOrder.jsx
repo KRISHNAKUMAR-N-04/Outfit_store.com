@@ -133,7 +133,7 @@ const PlaceOrder = () => {
         order_id: orderData.id,
         handler: async function (response) {
           try {
-            const backendRes = await fetch('http://localhost:5000/api/order/create', {
+            const backendRes = await fetch(`${BASE_URL}/api/order/create`, {
               method: 'POST',
               headers: {
                 "Content-Type": "application/json",
