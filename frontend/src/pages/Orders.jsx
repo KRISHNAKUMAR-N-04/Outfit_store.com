@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useContext } from 'react';
 import Title from '../components/Title';
 import { ShopContext } from '../context/ShopContext';
+import BASE_URL from '../utils/api';
 
 const Orders = () => {
   const [orders, setOrders] = useState([]);
@@ -13,7 +14,7 @@ const Orders = () => {
       if (!token) return setError('No token found');
 
       try {
-        const res = await fetch('http://localhost:5000/api/order/all', {
+        const res = await fetch(`${BASE_URL}/api/order/al`, {
           headers: {
             'Content-Type': 'application/json',
             Authorization: `Bearer ${token}`,
@@ -40,7 +41,7 @@ const Orders = () => {
     console.log("Order id : ", orderId)
 
     try {
-      const res = await fetch(`http://localhost:5000/api/order/cancel/${orderId}`, {
+      const res = await fetch(`${BASE_URL}/api/order/cancel/${orderId}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
