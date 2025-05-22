@@ -14,7 +14,7 @@ const Orders = () => {
       if (!token) return setError('No token found');
 
       try {
-        const res = await fetch(`${BASE_URL}/api/order/al`, {
+        const res = await fetch(`${BASE_URL}/api/order/alL`, {
           headers: {
             'Content-Type': 'application/json',
             Authorization: `Bearer ${token}`,
